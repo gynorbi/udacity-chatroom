@@ -26,7 +26,7 @@ public class LoginController {
                 oldSession.invalidate();
             }
             HttpSession newSession = request.getSession();
-            newSession.setAttribute("USERNAME", username);
+            newSession.setAttribute("username", username);
             return new ModelAndView(new RedirectView("/"));
         }
     }
