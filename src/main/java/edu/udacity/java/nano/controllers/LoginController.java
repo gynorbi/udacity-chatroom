@@ -17,7 +17,7 @@ public class LoginController {
 
     @PostMapping("/login")
     public ModelAndView loginSetUsername(String username, HttpServletRequest request) {
-        if(username == null) {
+        if(username == null || username == "") {
             return new ModelAndView("login");
         }
         else{

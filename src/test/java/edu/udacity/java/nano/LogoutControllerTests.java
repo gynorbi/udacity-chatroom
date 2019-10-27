@@ -1,6 +1,7 @@
 package edu.udacity.java.nano;
 
 import edu.udacity.java.nano.controllers.ChatController;
+import edu.udacity.java.nano.controllers.LogoutController;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -12,31 +13,29 @@ import org.springframework.web.servlet.view.RedirectView;
 
 
 @RunWith(SpringRunner.class)
-public class ChatControllerTests {
+public class LogoutControllerTests {
 
     @Test
     public void testNoSessionRedirectToLogin(){
-        ChatController controller = new ChatController();
+        LogoutController controller = new LogoutController();
         MockHttpServletRequest mockRequest = new MockHttpServletRequest();
-        ModelAndView actualMaV = controller.index(mockRequest);
+        ModelAndView actualMaV = controller.logout(mockRequest);
 
         Assert.assertTrue(((RedirectView)actualMaV.getView()).isRedirectView());
         Assert.assertEquals("/login", ((RedirectView)actualMaV.getView()).getUrl());
     }
 
     @Test
-    public void testValidSessionGoToChatRoom(){
-        ChatController controller = new ChatController();
+    public void testValidSessionInvalidateIsCalled(){
+        LogoutController controller = new LogoutController();
         String expectedUsername = "John Doe";
         MockHttpSession mockSession = new MockHttpSession();
-        mockSession.setAttribute("USERNAME",expectedUsername);
         MockHttpServletRequest mockRequest = new MockHttpServletRequest();
         mockRequest.setSession(mockSession);
-        ModelAndView actualMaV = controller.index(mockRequest);
+        ModelAndView actualMaV = controller.logout(mockRequest);
 
-        Assert.assertEquals("chat", actualMaV.getViewName());
-        Assert.assertEquals(expectedUsername,actualMaV.getModel().get("USERNAME"));
-
+        Assert.assertTrue(mockSession.isInvalid());
+        Assert.assertEquals("/login", ((RedirectView)actualMaV.getView()).getUrl());
     }
 
 }
