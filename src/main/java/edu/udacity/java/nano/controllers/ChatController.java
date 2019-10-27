@@ -24,7 +24,8 @@ public class ChatController {
             Object username = oldSession.getAttribute("username");
             ModelAndView chatMaV = new ModelAndView("chat");
             chatMaV.addObject("username", username);
-            String chatServerURL = "ws://"+request.getHeader("host")+"/chat";
+            String requestScheme = request.getScheme() == "http" ? "ws":"wss";
+            String chatServerURL = requestScheme+"://"+request.getHeader("host")+"/chat";
             chatMaV.addObject("webSocketUrl", chatServerURL);
             return chatMaV;
         }
