@@ -4,8 +4,10 @@ import org.springframework.stereotype.Component;
 
 import javax.websocket.*;
 import javax.websocket.server.ServerEndpoint;
+import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import com.alibaba.fastjson.JSON;
 
 /**
  * WebSocket Server
@@ -23,8 +25,24 @@ public class WebSocketChatServer {
      */
     private static Map<String, Session> onlineSessions = new ConcurrentHashMap<>();
 
-    private static void sendMessageToAll(String msg) {
-        //TODO: add send message method.
+    private static void sendMessageToAll(String jsonStr, String type) {
+        Message message;
+        if(jsonStr != null)
+            message = JSON.parseObject(jsonStr,Message.class);
+        else
+            message = new Message("","");
+        message.setType(type);
+        message.setOnlineCount(onlineSessions.size());
+
+        for(Session s : onlineSessions.values()){
+            try {
+                s.getBasicRemote().sendText(JSON.toJSONString(message));
+                System.out.println(String.format("Sending message '%1s' to session %2s", jsonStr,s.getId()));
+            }
+            catch (IOException ex) {
+                System.out.println("Error while sending message to session "+s.getId()+". Exception is: "+ex.toString());
+            }
+        }
     }
 
     /**
@@ -32,7 +50,9 @@ public class WebSocketChatServer {
      */
     @OnOpen
     public void onOpen(Session session) {
-        //TODO: add on open connection.
+        System.out.println("Connection opened with ID: "+session.getId());
+        onlineSessions.put(session.getId(),session);
+        sendMessageToAll(null,"STATUS");
     }
 
     /**
@@ -40,7 +60,8 @@ public class WebSocketChatServer {
      */
     @OnMessage
     public void onMessage(Session session, String jsonStr) {
-        //TODO: add send message.
+        System.out.println("Message received: " + jsonStr);
+        sendMessageToAll(jsonStr,"SPEAK");
     }
 
     /**
@@ -48,7 +69,9 @@ public class WebSocketChatServer {
      */
     @OnClose
     public void onClose(Session session) {
-        //TODO: add close connection.
+        System.out.println("Connection closed with ID: "+session.getId());
+        onlineSessions.remove(session.getId());
+        sendMessageToAll(null,"STATUS");
     }
 
     /**
