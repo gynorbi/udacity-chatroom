@@ -29,13 +29,13 @@ public class ChatControllerTests {
         ChatController controller = new ChatController();
         String expectedUsername = "John Doe";
         MockHttpSession mockSession = new MockHttpSession();
-        mockSession.setAttribute("USERNAME",expectedUsername);
+        mockSession.setAttribute("username",expectedUsername);
         MockHttpServletRequest mockRequest = new MockHttpServletRequest();
         mockRequest.setSession(mockSession);
         ModelAndView actualMaV = controller.index(mockRequest);
 
         Assert.assertEquals("chat", actualMaV.getViewName());
-        Assert.assertEquals(expectedUsername,actualMaV.getModel().get("USERNAME"));
+        Assert.assertEquals(expectedUsername,actualMaV.getModel().get("username"));
 
     }
 
